@@ -1,7 +1,7 @@
 module.exports = {
   development: {
     client: 'pg',
-    connection: 'postgres://localhost/color-me-newton',
+    connection: 'postgres://localhost/color_me_newton',
     migrations: {
       directory: './db/migrations'
     },
@@ -19,6 +19,6 @@ module.exports = {
     seeds: {
       directory: './db/seeds/dev'
     },
-    useNullAsDefault: true
+    useNullAsDefault: true 
   }
 };
