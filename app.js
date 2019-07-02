@@ -9,15 +9,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/v1/projects', (req, res) => {
-  database('projects').select()
-  .then(projects => {
-    res.status(200).json(projects);
-  })
-  .catch((error) => {
+app.get('/api/v1/projects', async (req, res) => {
+  try {
+    const projects = await database('projects').select()
+      res.status(200).json(projects);
+  }
+  catch (error) {
     res.status(500).json({ error });
-  });
+  }
 });
+
+app.get('/api/v1/projects/:id', async (req, res) => {
+  const project = database('projects').where('id', req.params.id).first()
+  res.status(200).json(project)
+})
 
 app.post('/api/v1/projects', (req, res) => {
   const {name} = req.body
