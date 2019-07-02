@@ -9,6 +9,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (request, response) => {
+  response.send('Hello World!);
+});
+
 app.get('/api/v1/projects', (req, res) => {
   database('projects').select()
   .then(projects => {
