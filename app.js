@@ -9,6 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 app.get('/api/v1/projects', async (req, res) => {
   try {
     const projects = await database('projects').select()
