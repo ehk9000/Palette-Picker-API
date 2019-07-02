@@ -6,10 +6,6 @@ const database = require('knex')(configuration)
 
 
 describe('Server', () => {
-
-  it('expect true to equal true', () => {
-    expect(true).toEqual(true);
-  })
   describe('GET /projects', () => {
     it('should return all the projects in the DB ', async () => {
       // set up 
@@ -20,7 +16,6 @@ describe('Server', () => {
   
       // expectation
       expect(projects).toEqual(expectedProjects)
-  
     })
   })
 })
