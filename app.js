@@ -20,8 +20,13 @@ app.get('/api/v1/projects', async (req, res) => {
 });
 
 app.get('/api/v1/projects/:id', async (req, res) => {
-  const project = database('projects').where('id', req.params.id).first()
-  res.status(200).json(project)
+  try {
+    const project = database('projects').where('id', req.params.id).first()
+    res.status(200).json(project)
+  }
+  catch (error) {
+    res.status(500).json({ error })
+  }
 })
 
 app.post('/api/v1/projects', (req, res) => {
