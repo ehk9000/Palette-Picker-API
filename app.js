@@ -96,10 +96,22 @@ app.post('/api/v1/palettes/', async (req, res) => {
 })
 
 app.delete('/api/v1/projects/:id', async (req, res) => {
-  const id = request.params.id;
+  const id = req.params.id;
   try {
     const project = await database('projects').where('id', id).delete()
     if (!project) return res.status(404).json({ error: `Can't find project with id ${id}` })
+    res.status(200).json(`Project with id of ${id} was successfully deleted`)
+  }
+  catch(error) {
+    res.status(500).json({ error })
+  }
+})
+
+app.delete('/api/v1/palettes/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const palette = await database('projects').where('id', id).delete()
+    if (!palette) return res.status(404).json({ error: `Can't find project with id ${id}` })
     res.status(200).json(`Project with id of ${id} was successfully deleted`)
   }
   catch(error) {
