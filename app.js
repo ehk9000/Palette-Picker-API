@@ -24,13 +24,35 @@ app.get('/api/v1/projects/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const project = await database('projects').where('id', id).first()
-    if (!project) return res.status(404).json(`Cant find project with id ${id}`)
+    if (!project) return res.status(404).json(`Can't find project with id ${id}`)
     res.status(200).json(project)
   }
   catch (error) {
     res.status(500).json({ error })
   }
 })
+
+app.get('/api/v1/palettes/', async (req, res) => {
+  try {
+    const palettes = await database('palettes').select()
+    res.status(200).json(palettes);
+  }
+  catch (error) {
+    res.status(500).json({ error })
+  }
+})
+
+app.get('/api/v1/palettes/:id', async (req, res) => {
+  const id = req.params.id
+  try {
+    const palette = await database('palettes').where('id', id).first()
+    if (!palette) return res.status(404).json(`Can't find project with id ${id}`)
+  }
+  catch (error) {
+    res.status(500).json({ error })
+  }
+})
+
 
 app.post('/api/v1/projects', async (req, res) => {
   const { name } = req.body
