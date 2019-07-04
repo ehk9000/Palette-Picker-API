@@ -72,7 +72,7 @@ app.post('/api/v1/palettes/', async (req, res) => {
 
   let requiredFormat = ['palette_name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
 
-  console.log('endPo palette', palette);
+  // console.log('endPo palette', palette);
   for (let requiredParameter of requiredFormat) {
     if (!palette[requiredParameter]) {
       return res.status(422).send({ 

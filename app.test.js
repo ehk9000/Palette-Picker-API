@@ -89,10 +89,10 @@ describe('Server', () => {
 
         const response = await request(app).post('/api/v1/palettes').send(newPalette);
         const id = response.body.id;
-        console.log('id', id);
-        console.log('response', response.body);
+        // console.log('id', id);
+        // console.log('response', response.body);
         const palettes = await database('palettes').select();
-        console.log('DB Palettes', palettes);
+        // console.log('DB Palettes', palettes);
         const palette = await database('palettes').where('id', id).first();
 
         expect(newPalette.color_1).toEqual(palette.color_1);
