@@ -69,6 +69,7 @@ This project is a RESTful api for the purpose of allowing users to create projec
 ### GET /api/v1/projects/{id}
 
 - Single Project
+
 | Name        | Description                                       | Type     |
 | ------------|:-------------------------------------------------:| ----:    |
 | `id`        | The identifier for the project                    | `number` |
@@ -78,6 +79,7 @@ This project is a RESTful api for the purpose of allowing users to create projec
 ### GET /api/v1/palettes/{id}
 
 - Single Palette
+
 | Name          | Description                                       | Type     |
 | --------------|:-------------------------------------------------:| ------:  |
 | `id`          | The identifier for the friendly npc               | `number` |
@@ -119,7 +121,8 @@ This project is a RESTful api for the purpose of allowing users to create projec
 
 - Make sure the format looks like this:
   - Must have 6 digits for HEX value, like the below example
-  - Project_id needs to be passed through with the object. If creating a new project, make sure to fire the Post request for that first. Then you can grab the id from Project Post request. If no Project_id is passed, the backend will create a default.
+  - Project_id needs to be passed through with the object. If creating a new project, make sure to fire the Post request for that first. Then you can grab the id from Project Post request. 
+  - If no Project_id is passed, the backend will create a default.
 ```
 {
  name: 'Palette name',
