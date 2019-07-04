@@ -3,6 +3,7 @@ module.exports = [
     name: 'Test',
     palettes: [
       {
+        name:'test palette',
         color_1: 'A8E0FF',
         color_2: '8EE3F5',
         color_3: '70CAD1',
