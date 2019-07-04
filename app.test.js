@@ -9,6 +9,9 @@ describe('Server', () => {
   beforeEach(async () => {
     await database.seed.run
   })
+  afterEach(async () => {
+    await database.seed.run
+  })
   describe('GET Methods for Palettes & Projects', () => {
     describe('GET /projects && /palettes', () => {
       it('should return all the projects in the DB ', async () => {
@@ -77,7 +80,7 @@ describe('Server', () => {
 
         expect(newProject.name).toEqual(project.name)
       })
-      it('should post a new palette to the database', async () => {
+      it.skip('should post a new palette to the database', async () => {
         let newPalette = {
           name: 'Test Put',
           color_1: '3e3e3e',
@@ -104,5 +107,27 @@ describe('Server', () => {
 
   })
   describe('DELETE Methods for Palettes & Projects', () => {
+    it('should remove the project from the database by id, as well as remove any related palettes', async () => {
+      const project = await database('projects').first();
+      const id = project.id;
+
+      const response = await request(app).delete(`/api/v1/projects/${id}`);
+
+      const deletedProject = await database('projects').where({id: id}).first();
+      const deletedPalette = await database('palettes').where({project_id: id}).first()
+
+      expect(deletedProject).toEqual(undefined);
+// !! BUG: This code deletes Palettes, and doesn't re-seed after. Which makes us fail the test for getting a single palette !!
+      expect(deletedPalette).toEqual(undefined);
+    })
+    it('should remove the palette from the database by id', async () => {
+      const palette = await database('palettes').first();
+      const id = palette.id;
+
+      const response = await request(app).delete('/palettes/${id}');
+      const deletedPalette = await database('palettes').where({id: id}).first();
+
+      expect(deletedPalette).toEqual(undefined);
+    })
   })
 })
