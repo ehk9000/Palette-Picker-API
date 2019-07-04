@@ -79,7 +79,7 @@ describe('Server', () => {
       })
       it('should post a new palette to the database', async () => {
         let newPalette = {
-          palette_name: 'Test Put',
+          name: 'Test Put',
           color_1: '3e3e3e',
           color_2: '6f6f6f',
           color_3: '7e7e7e',
