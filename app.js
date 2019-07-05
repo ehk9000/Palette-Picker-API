@@ -57,8 +57,17 @@ app.get('/api/v1/palettes/:id', async (req, res) => {
 
 app.post('/api/v1/projects/', async (req, res) => {
   const { name } = req.body
+  const projectAlreadyExists = await database('projects').where({name})
+
   try {
-    if(!name) return res.status(422).json('Please name your project');
+    if(!name) {
+      return res.status(422).json('Please name your project');
+
+    }
+    if (projectAlreadyExists.length !== 0) {
+      return res.status(422).json(`Project name with ${name} already exists. Please provide a unique name`)
+    }
+      
     const id = await database('projects').insert({ name }, 'id')
     res.status(201).json({ name, id: id[0] });
   }
@@ -70,9 +79,8 @@ app.post('/api/v1/projects/', async (req, res) => {
 app.post('/api/v1/palettes/', async (req, res) => {
   const palette = req.body;
 
-  let requiredFormat = ['palette_name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
+  let requiredFormat = ['name', 'project_name','color_1', 'color_2', 'color_3', 'color_4', 'color_5']
 
-  // console.log('endPo palette', palette);
   for (let requiredParameter of requiredFormat) {
     if (!palette[requiredParameter]) {
       return res.status(422).send({ 
@@ -82,10 +90,20 @@ app.post('/api/v1/palettes/', async (req, res) => {
     }
   }
 
-  // make sure the project ID corresponds with the palette
-  // If no project, create project w/ default values
-  // else use project id as project_id (foreign key)
-  // !! REMEMBER to add palette_name to table
+  // if (!palette.project_name) {
+  //   palette.project_name = 'Unsaved Project'
+  //   const id = await database('projects').insert({name: 'Unsaved Project'}, 'id')
+  //   res.status(201).json({id: id[0]})
+  // }
+
+  const newPalette = {
+    name: palette.name,
+    color_1: palette.color_1,
+    color_2: palette.color_2,
+    color_3: palette.color_3,
+    color_4: palette.color_4,
+    color_5: palette.color_5
+  }
 
   try {
     const projectId = await database('projects').where({name: palette.project_name}).select('id')
@@ -95,6 +113,63 @@ app.post('/api/v1/palettes/', async (req, res) => {
   catch(error) {
     res.status(500).json({ error })
   }
+})
+
+app.put('/api/v1/projects/:id', async (req, res) => {
+  const id = req.params.id
+  const project = await database('projects').where('id', id)
+  const newProject = req.body
+
+  if (!project.length) {
+    return res.status(404).json({ error: `Can't find project with id ${id}`})
+  }
+
+  if (!newProject.name) {
+    return res.status(422).send({
+      error: 'Expected format: name: <String>. You must provide a project name'
+    });
+  }
+
+  try {
+    await database('projects').where('id', id).update(newProject)
+    res.status(201).json(newProject)
+  }
+
+  catch(error) {
+    res.status(500).json({ error })
+  }
+});
+
+app.put('/api/v1/palettes/:id', async (req, res) => {
+  const id = req.params.id
+  const palette = await database('palettes').where('id', id)
+  const newPalette = req.body
+  let requiredFormat = ['name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
+
+  if (!palette.length) {
+    return res.status(404).json({ error: `Can't find palette with id ${id}`})
+  }
+
+  for (let requiredParameter of requiredFormat) {
+    if (!newPalette[requiredParameter]) {
+      return res.status(422).send({
+        error: `Expected format: name: <String>, color_1:<String>,
+        color_2:<String>, color_3:<String>, color_4:<String>, color_5:<String>.
+        You are missing "${requiredParameter}" property`
+      })
+    }
+  }
+
+  try {
+    await database('palettes').where('id', id).update(newPalette)
+    res.status(201).json(newPalette)
+  }
+
+  catch(error) {
+    res.status(500).json({ error })
+  }
+
+
 })
 
 app.delete('/api/v1/projects/:id', async (req, res) => {

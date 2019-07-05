@@ -70,28 +70,25 @@ describe('Server', () => {
     it('should post a new project to the database', async () => {
       const newProject = {name: 'BYOB'}
 
-      const response = await request(app).post('/api/v1/projects').send(newProject)
+      const response = await request(app).post('/api/v1/projects/').send(newProject)
       const id = response.body.id;
       const project = await database('projects').where('id', id).first();
 
       expect(newProject.name).toEqual(project.name)
     })
-    it.skip('should post a new palette to the database', async () => {
-      let newPalette = {
-        name: 'Test Put',
+    it('should post a new palette to the database', async () => {
+      const newPalette = {
+        name: 'new fun palette',
         color_1: '3e3e3e',
         color_2: '6f6f6f',
         color_3: '7e7e7e',
         color_4: 'eeeeee',
-        color_5: '999999'
+        color_5: '999999',
+        project_name: 'Test'
       }
 
-      const response = await request(app).post('/api/v1/palettes').send(newPalette);
-      const id = response.body.id;
-      // console.log('id', id);
-      // console.log('response', response.body);
-      const palettes = await database('palettes').select();
-      // console.log('DB Palettes', palettes);
+      const response = await request(app).post('/api/v1/palettes/').send(newPalette);
+      const id = response.body.id
       const palette = await database('palettes').where('id', id).first();
 
       expect(newPalette.color_1).toEqual(palette.color_1);
@@ -103,23 +100,32 @@ describe('Server', () => {
       const project = await database('projects').first();
       let expectedProject = project;
       expectedProject.name = 'Change Project';
+      expectedProject.created_at = expectedProject.created_at.toJSON()
+      expectedProject.updated_at = expectedProject.updated_at.toJSON()
 
       const id = project.id;
       const response = await request(app).put(`/api/v1/projects/${id}`).send(expectedProject);
 
+
       expect(id).toEqual(response.body.id);
-      expect(project).not.toEqual(expectedProject)
+      expect(response.body).toEqual(expectedProject)
+
     })
     it('should update palette based on id', async () => {
       const palette = await database('palettes').first();
       let expectedPalette = palette;
       expectedPalette.name = 'Change palette';
+      expectedPalette.color_1 = 'A3HTB';
+      expectedPalette.color_3 = '1298B';
+      expectedPalette.created_at = expectedPalette.created_at.toJSON()
+      expectedPalette.updated_at = expectedPalette.updated_at.toJSON()
+      
 
       const id = palette.id;
       const response = await request(app).put(`/api/v1/palettes/${id}`).send(expectedPalette);
-
+      
       expect(id).toEqual(response.body.id);
-      expect(palette).not.toEqual(expectedPalette)
+      expect(response.body).toEqual(expectedPalette)
     })
   })
   describe('DELETE Methods for Palettes & Projects', () => {
