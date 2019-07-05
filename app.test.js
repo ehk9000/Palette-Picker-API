@@ -76,7 +76,7 @@ describe('Server', () => {
 
       expect(newProject.name).toEqual(project.name)
     })
-    it.skip('should post a new palette to the database', async () => {
+    it('should post a new palette to the database', async () => {
       let newPalette = {
         name: 'Test Put',
         color_1: '3e3e3e',
@@ -112,18 +112,23 @@ describe('Server', () => {
 
       expect(id).toEqual(response.body.id);
       expect(response.body).toEqual(expectedProject)
-      
+
     })
-    it.skip('should update palette based on id', async () => {
+    it('should update palette based on id', async () => {
       const palette = await database('palettes').first();
       let expectedPalette = palette;
       expectedPalette.name = 'Change palette';
+      expectedPalette.color_1 = 'A3HTB';
+      expectedPalette.color_3 = '1298B';
+      expectedPalette.created_at = expectedPalette.created_at.toJSON()
+      expectedPalette.updated_at = expectedPalette.updated_at.toJSON()
+      
 
       const id = palette.id;
       const response = await request(app).put(`/api/v1/palettes/${id}`).send(expectedPalette);
-
+      
       expect(id).toEqual(response.body.id);
-      expect(palette).not.toEqual(expectedPalette)
+      expect(response.body).toEqual(expectedPalette)
     })
   })
   describe('DELETE Methods for Palettes & Projects', () => {

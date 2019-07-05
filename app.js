@@ -70,7 +70,7 @@ app.post('/api/v1/projects/', async (req, res) => {
 app.post('/api/v1/palettes/', async (req, res) => {
   const palette = req.body;
 
-  let requiredFormat = ['palette_name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
+  let requiredFormat = ['name', 'project_name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
 
   for (let requiredParameter of requiredFormat) {
     if (!palette[requiredParameter]) {
@@ -82,7 +82,7 @@ app.post('/api/v1/palettes/', async (req, res) => {
   }
 
   try {
-    const projectId = await database('projects').where({name: palette.project_name}).select('id')
+    const projectId = await database('projects').where({project_name: palette.project_name}).select('id')
     const finishedPalette = await database('palettes').insert({...newPalette, project_id: projectId[0].id}, 'id');
     res.status(201).json({ id: finishedPalette[0]})
   }
@@ -95,8 +95,6 @@ app.put('/api/v1/projects/:id', async (req, res) => {
   const id = req.params.id
   const project = await database('projects').where('id', id)
   const newProject = req.body
-  console.log(newProject);
-  
 
   if (!project.length) {
     return res.status(404).json({ error: `Can't find project with id ${id}`})
@@ -109,15 +107,46 @@ app.put('/api/v1/projects/:id', async (req, res) => {
   }
 
   try {
-    console.log('helllooooo we are in the try block')
     await database('projects').where('id', id).update(newProject)
     res.status(201).json(newProject)
   }
 
-  catch (error) {
+  catch(error) {
     res.status(500).json({ error })
   }
 });
+
+app.put('/api/v1/palettes/:id', async (req, res) => {
+  const id = req.params.id
+  const palette = await database('palettes').where('id', id)
+  const newPalette = req.body
+  let requiredFormat = ['name','color_1', 'color_2', 'color_3', 'color_4', 'color_5']
+
+  if (!palette.length) {
+    return res.status(404).json({ error: `Can't find palette with id ${id}`})
+  }
+
+  for (let requiredParameter of requiredFormat) {
+    if (!newPalette[requiredParameter]) {
+      return res.status(422).send({
+        error: `Expected format: name: <String>, color_1:<String>,
+        color_2:<String>, color_3:<String>, color_4:<String>, color_5:<String>.
+        You are missing "${requiredParameter}" property`
+      })
+    }
+  }
+
+  try {
+    await database('palettes').where('id', id).update(newPalette)
+    res.status(201).json(newPalette)
+  }
+
+  catch(error) {
+    res.status(500).json({ error })
+  }
+
+
+})
 
 app.delete('/api/v1/projects/:id', async (req, res) => {
   const id = req.params.id;
