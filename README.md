@@ -1,4 +1,5 @@
 # Palette-Picker Api 
+[![Build Status](https://travis-ci.org/ehk9000/Palette-Picker-API.svg?branch=master)](https://travis-ci.org/ehk9000/Palette-Picker-API)
 
 ## Description 
 
