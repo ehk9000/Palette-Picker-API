@@ -1,12 +1,14 @@
 language: node_js
-node_js: 
- - "node"
-services: 
-  - "postgresql"
+node_js:
+- node
+services:
+- postgresql
 before_script:
-  - psql -c 'CREATE DATABASE color_me_newton_test;' -U postgres
-  - knex migrate:latest --env=test
-  - knex seed:run --env=test
+- psql -c 'CREATE DATABASE color_me_newton_test;' -U postgres
+- knex migrate:latest --env=test
+- knex seed:run --env=test
 deploy:
   provider: heroku
   app: color-me-newton-api
+  api_key:
+    secure: O2ys4t8LLq6JkWjgJVZafzhxnimAxRlk67li+zwV+Hj59p+aRFKeIvsJw5H8efPdW6RhysLtU5B+kYrMR7Q9199Ph8ZN+PLirGXafhO2mLKD6E0jXqIUb9u0owZlqC8YV8TxsyPPxICNQVLBqL4FzQnxENNvDdEpux8WbdEUxVyn9AsYBsqac74HnzFt8xKVBV/eTK1J7BYB6imxcIPvgZSTPGyune33id3VLjAQ5Rd99fZpu7dYDSkpvgWjOf7+WhE+FpNsJtLQcm68IhZkHoyPPJxN6ksnre5Bfe6DrEMi9h+A2zKFEA7IFfZVNNhOJwavnNhypFec9sH19jqfQpiIgjHz9iNB+Js2LQ8ri9NL6ik5/B7D5pHkpAgpOuuIR8mvLV+IPpGn3+Ip6r0BROVAJgYDrKKPVU3nBZq+zfaucXI7ZnygrnX/HEOm7cXNBu1BlbozmmhAqDm7Wcjg7cP+gg54j6hwqPEU12uxthgf666CaqcZEfV6FKvc73qWFuQoCg/08nQubcyWGPpdBc37tnScbIOBmCDOG2DaoocQht0gJDc8/gMWdtl84M3sJ23dYZEJeByGHvQutRxFpwdcr6skzhsF6ZsZze2ffhzW1ai6Kn5opZ4d7Wun3ruJHXJ5USYBApro3VzUdsAfSGk1p9l+QvN6nu4eCUdPWHU=
