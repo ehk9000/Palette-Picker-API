@@ -2,6 +2,11 @@ language: node_js
 node_js: 
  - "node"
 services: 
-  - postgresql
+  - "postgresql"
 before_script:
-  - psql -c 'CREATE DATABASE color_me_newton_test' -U postgres
+  - psql -c 'CREATE DATABASE color_me_newton_test;' -U postgres
+  - knex migrate:latest --env=test
+  - knex seed:run --env=test
+deploy:
+  provider: heroku
+  app: color-me-newton-api
