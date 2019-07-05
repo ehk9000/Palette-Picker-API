@@ -80,9 +80,17 @@ app.post('/api/v1/palettes/', async (req, res) => {
         You are missing "${requiredParameter}" property`})
     }
   }
+  const newPalette = {
+    name: palette.name,
+    color_1: palette.color_1,
+    color_2: palette.color_2,
+    color_3: palette.color_3,
+    color_4: palette.color_4,
+    color_5: palette.color_5
+  }
 
   try {
-    const projectId = await database('projects').where({project_name: palette.project_name}).select('id')
+    const projectId = await database('projects').where({name: palette.project_name}).select('id')
     const finishedPalette = await database('palettes').insert({...newPalette, project_id: projectId[0].id}, 'id');
     res.status(201).json({ id: finishedPalette[0]})
   }

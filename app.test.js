@@ -70,28 +70,25 @@ describe('Server', () => {
     it('should post a new project to the database', async () => {
       const newProject = {name: 'BYOB'}
 
-      const response = await request(app).post('/api/v1/projects').send(newProject)
+      const response = await request(app).post('/api/v1/projects/').send(newProject)
       const id = response.body.id;
       const project = await database('projects').where('id', id).first();
 
       expect(newProject.name).toEqual(project.name)
     })
     it('should post a new palette to the database', async () => {
-      let newPalette = {
-        name: 'Test Put',
+      const newPalette = {
+        name: 'new fun palette',
         color_1: '3e3e3e',
         color_2: '6f6f6f',
         color_3: '7e7e7e',
         color_4: 'eeeeee',
-        color_5: '999999'
+        color_5: '999999',
+        project_name: 'Test'
       }
 
-      const response = await request(app).post('/api/v1/palettes').send(newPalette);
-      const id = response.body.id;
-      // console.log('id', id);
-      // console.log('response', response.body);
-      const palettes = await database('palettes').select();
-      // console.log('DB Palettes', palettes);
+      const response = await request(app).post('/api/v1/palettes/').send(newPalette);
+      const id = response.body.id
       const palette = await database('palettes').where('id', id).first();
 
       expect(newPalette.color_1).toEqual(palette.color_1);
