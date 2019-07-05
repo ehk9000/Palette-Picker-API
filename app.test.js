@@ -7,10 +7,7 @@ const database = require('knex')(configuration)
 
 describe('Server', () => {
   beforeEach(async () => {
-    await database.seed.run
-  })
-  afterEach(async () => {
-    await database.seed.run
+    await database.seed.run()
   })
   describe('GET Methods for Palettes & Projects', () => {
     describe('GET /projects && /palettes', () => {
@@ -111,20 +108,19 @@ describe('Server', () => {
       const project = await database('projects').first();
       const id = project.id;
 
-      const response = await request(app).delete(`/api/v1/projects/${id}`);
+      await request(app).delete(`/api/v1/projects/${id}`);
 
       const deletedProject = await database('projects').where({id: id}).first();
-      const deletedPalette = await database('palettes').where({project_id: id}).first()
+      const deletedPalettes = await database('palettes').where({project_id: id}).select()
 
       expect(deletedProject).toEqual(undefined);
-// !! BUG: This code deletes Palettes, and doesn't re-seed after. Which makes us fail the test for getting a single palette !!
-      expect(deletedPalette).toEqual(undefined);
+      expect(deletedPalettes.length).toEqual(0);
     })
     it('should remove the palette from the database by id', async () => {
       const palette = await database('palettes').first();
       const id = palette.id;
 
-      const response = await request(app).delete('/palettes/${id}');
+      await request(app).delete(`/api/v1/palettes/${id}`);
       const deletedPalette = await database('palettes').where({id: id}).first();
 
       expect(deletedPalette).toEqual(undefined);
