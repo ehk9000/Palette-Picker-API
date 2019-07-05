@@ -7,7 +7,7 @@ const database = require('knex')(configuration)
 
 describe('Server', () => {
   beforeEach(async () => {
-    await database.seed.run
+    await database.seed.run()
   })
   describe('GET Methods for Palettes & Projects', () => {
     describe('GET /projects && /palettes', () => {
@@ -77,7 +77,7 @@ describe('Server', () => {
 
         expect(newProject.name).toEqual(project.name)
       })
-      it('should post a new palette to the database', async () => {
+      it.skip('should post a new palette to the database', async () => {
         let newPalette = {
           name: 'Test Put',
           color_1: '3e3e3e',
@@ -104,5 +104,26 @@ describe('Server', () => {
 
   })
   describe('DELETE Methods for Palettes & Projects', () => {
+    it('should remove the project from the database by id, as well as remove any related palettes', async () => {
+      const project = await database('projects').first();
+      const id = project.id;
+
+      await request(app).delete(`/api/v1/projects/${id}`);
+
+      const deletedProject = await database('projects').where({id: id}).first();
+      const deletedPalettes = await database('palettes').where({project_id: id}).select()
+
+      expect(deletedProject).toEqual(undefined);
+      expect(deletedPalettes.length).toEqual(0);
+    })
+    it('should remove the palette from the database by id', async () => {
+      const palette = await database('palettes').first();
+      const id = palette.id;
+
+      await request(app).delete(`/api/v1/palettes/${id}`);
+      const deletedPalette = await database('palettes').where({id: id}).first();
+
+      expect(deletedPalette).toEqual(undefined);
+    })
   })
 })
