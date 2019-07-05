@@ -57,8 +57,17 @@ app.get('/api/v1/palettes/:id', async (req, res) => {
 
 app.post('/api/v1/projects/', async (req, res) => {
   const { name } = req.body
+  const projectAlreadyExists = await database('projects').where({name})
+
   try {
-    if(!name) return res.status(422).json('Please name your project');
+    if(!name) {
+      return res.status(422).json('Please name your project');
+
+    }
+    if (projectAlreadyExists.length !== 0) {
+      return res.status(422).json(`Project name with ${name} already exists. Please provide a unique name`)
+    }
+      
     const id = await database('projects').insert({ name }, 'id')
     res.status(201).json({ name, id: id[0] });
   }
@@ -70,7 +79,7 @@ app.post('/api/v1/projects/', async (req, res) => {
 app.post('/api/v1/palettes/', async (req, res) => {
   const palette = req.body;
 
-  let requiredFormat = ['name', 'project_name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
+  let requiredFormat = ['name', 'project_name','color_1', 'color_2', 'color_3', 'color_4', 'color_5']
 
   for (let requiredParameter of requiredFormat) {
     if (!palette[requiredParameter]) {
@@ -80,6 +89,13 @@ app.post('/api/v1/palettes/', async (req, res) => {
         You are missing "${requiredParameter}" property`})
     }
   }
+
+  // if (!palette.project_name) {
+  //   palette.project_name = 'Unsaved Project'
+  //   const id = await database('projects').insert({name: 'Unsaved Project'}, 'id')
+  //   res.status(201).json({id: id[0]})
+  // }
+
   const newPalette = {
     name: palette.name,
     color_1: palette.color_1,
@@ -128,7 +144,7 @@ app.put('/api/v1/palettes/:id', async (req, res) => {
   const id = req.params.id
   const palette = await database('palettes').where('id', id)
   const newPalette = req.body
-  let requiredFormat = ['name','color_1', 'color_2', 'color_3', 'color_4', 'color_5']
+  let requiredFormat = ['name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
 
   if (!palette.length) {
     return res.status(404).json({ error: `Can't find palette with id ${id}`})
