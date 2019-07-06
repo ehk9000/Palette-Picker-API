@@ -54,6 +54,19 @@ app.get('/api/v1/palettes/:id', async (req, res) => {
   }
 })
 
+app.get('/api/v1/projects/:name', async (req, res) => {
+  const name = req.params.name;
+  try {
+    const project = await database('project').where('name', name).first()
+    if (!project) {
+      return res.status(404).json({ error: `Can't find project with name ${name}`})
+    }
+    res.status(200).json(project)
+  }
+  catch(error) {
+    res.status(500).json({ error })
+  }
+})
 
 app.post('/api/v1/projects/', async (req, res) => {
   const { name } = req.body
