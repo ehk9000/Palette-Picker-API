@@ -11,9 +11,16 @@ app.use(express.json());
 
 
 app.get('/api/v1/projects/', async (req, res) => {
+  var name = req.query.name;
+  let projects;
+  if (name) {
+    projects = await database('projects').where('name', 'like', `${name}%`)
+  } else {
+    projects = await database('projects').select()
+  }
   try {
-    const projects = await database('projects').select()
-      res.status(200).json(projects);
+    if (!projects.length) return res.status(404).json({ error: `Can't find project any projects starting with ${name}`})
+    res.status(200).json(projects);
   }
   catch(error) {
     res.status(500).json({ error });
