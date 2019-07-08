@@ -26,6 +26,23 @@ describe('Server', () => {
         // expectation
         expect(projects).toEqual(expectedProjects)
       })
+
+      it('should return the correct project if there is a name query parameter', async () => {
+        const expectedProject = await database('projects').first().select();
+        expectedProject.created_at = expectedProject.created_at.toJSON();
+        expectedProject.updated_at = expectedProject.updated_at.toJSON();
+
+        const response = await request(app).get('/api/v1/projects?name=T');
+        
+        expect(response.status).toBe(200);
+        expect(response.body[0]).toEqual(expectedProject);
+      })
+
+      it('should return a 404 error if the name in the query parameter does not match any project names', async () => {
+        const response = await request(app).get('/api/v1/projects?name=noproject')
+        expect(response.status).toBe(404)
+      })
+
       it('should return all the palettes in the DB', async () => {
         const expectedPalettes = await database('palettes').select()
         expectedPalettes.forEach(palette => {
