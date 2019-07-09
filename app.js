@@ -156,8 +156,6 @@ app.put('/api/v1/palettes/:id', async (req, res) => {
   catch(error) {
     res.status(500).json({ error })
   }
-
-
 })
 
 app.delete('/api/v1/projects/:id', async (req, res) => {

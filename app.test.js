@@ -249,7 +249,14 @@ describe('Server', () => {
 
       expect(deletedProject).toEqual(undefined);
       expect(deletedPalettes.length).toEqual(0);
-    })
+    });
+
+    it('should return an error if no project exists with the given id', async () => {
+      const response = await request(app).delete(`/api/v1/projects/500`);
+
+      expect(response.body.error).toEqual(`Can't find project with id 500`);
+    });
+
     it('should remove the palette from the database by id', async () => {
       const palette = await database('palettes').first();
       const id = palette.id;
@@ -258,6 +265,6 @@ describe('Server', () => {
       const deletedPalette = await database('palettes').where({id: id}).first();
 
       expect(deletedPalette).toEqual(undefined);
-    })
-  })
-})
+    });
+  });
+});
