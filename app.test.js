@@ -266,5 +266,11 @@ describe('Server', () => {
 
       expect(deletedPalette).toEqual(undefined);
     });
+
+    it('should return an error if no palette exists with the given id', async () => {
+      const response = await request(app).delete(`/api/v1/palettes/500`);
+
+      expect(response.body.error).toEqual(`Can't find palette with id 500`);
+    });
   });
 });
