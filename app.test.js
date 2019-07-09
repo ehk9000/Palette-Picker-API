@@ -194,6 +194,15 @@ describe('Server', () => {
       expect(response.body.error).toEqual(`Can't find project with id ${project.id}`);
     });
 
+    it('should not update a project if no name is provided', async () => {
+      const project = await database('projects').first()
+      project.name = '';
+      
+      const response = await request(app).put(`/api/v1/projects/${project.id}`).send(project);
+
+      expect(response.body.error).toEqual(`Expected format: name: <String>. You must provide a project name`);
+    });
+
     it('should update palette based on id', async () => {
       const palette = await database('palettes').first();
       let expectedPalette = palette;
