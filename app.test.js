@@ -66,6 +66,7 @@ describe('Server', () => {
         
         expect(project).toEqual(expectedProject);
       })
+
       it('should return a single palette with the id in the params', async () => {
         const expectedPalette = await database('palettes').first();
         const id = expectedPalette.id;
@@ -91,15 +92,16 @@ describe('Server', () => {
     });
 
     it('should not post a project to the database if the given name is already used', async () => {
-      const newProject = {name: "Test"};
+      const duplicateProject = await database('projects').first();
 
-      const response = await request(app).post('/api/v1/projects/').send(newProject);
+      const response = await request(app).post('/api/v1/projects/').send(duplicateProject);
 
       expect(response.status).toEqual(422)
-      expect(response.body).toEqual('Project name with Test already exists. Please provide a unique name');
+      expect(response.body).toEqual(`Project name with ${duplicateProject.name} already exists. Please provide a unique name`);
     });
 
     it('should post a new palette to the database', async () => {
+      const { id } = await database('projects').first();
       const newPalette = {
         name: 'new fun palette',
         color_1: '3e3e3e',
@@ -107,15 +109,22 @@ describe('Server', () => {
         color_3: '7e7e7e',
         color_4: 'eeeeee',
         color_5: '999999',
-        project_name: 'Test'
+        project_id: id
       };
 
       const response = await request(app).post('/api/v1/palettes/').send(newPalette);
-      const id = response.body.id;
-      const palette = await database('palettes').where('id', id).first();
 
-      expect(newPalette.color_1).toEqual(palette.color_1);
+      expect({...newPalette, id: response.body.id}).toEqual(response.body);
     })
+
+    it('should not post a palette to the database if the given name is already used', async () => {
+      const duplicatePalette = await database('palettes').first();
+
+      const response = await request(app).post('/api/v1/palettes/').send(duplicatePalette);
+
+      expect(response.status).toEqual(422)
+      expect(response.body.error).toEqual(`Palette name of ${duplicatePalette.name} already exists. Please provide a unique name`);
+    });
   })
   
   describe('PUT Methods for Palettes & Projects', () => {
