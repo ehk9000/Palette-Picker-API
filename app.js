@@ -132,7 +132,7 @@ app.put('/api/v1/palettes/:id', async (req, res) => {
   const id = req.params.id
   const palette = await database('palettes').where('id', id)
   const newPalette = req.body
-  let requiredFormat = ['name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
+  let requiredFormat = ['name', 'project_id', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
 
   if (!palette.length) {
     return res.status(404).json({ error: `Can't find palette with id ${id}`})
@@ -143,7 +143,7 @@ app.put('/api/v1/palettes/:id', async (req, res) => {
       return res.status(422).send({
         error: `Expected format: name: <String>, color_1:<String>,
         color_2:<String>, color_3:<String>, color_4:<String>, color_5:<String>.
-        You are missing "${requiredParameter}" property`
+        You are missing ${requiredParameter} property`
       })
     }
   }

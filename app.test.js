@@ -197,7 +197,7 @@ describe('Server', () => {
     it('should not update a project if no name is provided', async () => {
       const project = await database('projects').first()
       project.name = '';
-      
+
       const response = await request(app).put(`/api/v1/projects/${project.id}`).send(project);
 
       expect(response.body.error).toEqual(`Expected format: name: <String>. You must provide a project name`);
@@ -219,6 +219,23 @@ describe('Server', () => {
       expect(id).toEqual(response.body.id);
       expect(response.body).toEqual(expectedPalette);
     })
+
+    it('should not update a palette if there are no palettes with the given id', async () => {
+      const response = await request(app).put('/api/v1/palettes/500').send({name: 'Fail'});
+
+      expect(response.body.error).toEqual(`Can't find palette with id 500`);
+    });
+
+    it('should not update a palette if any of the required parameters are missing', async () => {
+      const palette = await database('palettes').first();
+      palette.color_4 = '';
+
+      const response = await request(app).put(`/api/v1/palettes/${palette.id}`).send(palette);
+
+      expect(response.body.error).toEqual(`Expected format: name: <String>, color_1:<String>,
+        color_2:<String>, color_3:<String>, color_4:<String>, color_5:<String>.
+        You are missing color_4 property`);
+    });
   })
   describe('DELETE Methods for Palettes & Projects', () => {
     it('should remove the project from the database by id, as well as remove any related palettes', async () => {
