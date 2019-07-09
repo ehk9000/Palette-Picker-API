@@ -105,13 +105,22 @@ describe('Server', () => {
       expect(newProject.name).toEqual(project.name);
     });
 
+    it('should not post a project to the database if no name is provided', async () => {
+      const newProject = {name: ''};
+
+      const response = await request(app).post('/api/v1/projects/').send(newProject);
+
+      expect(response.status).toEqual(422)
+      expect(response.body.error).toEqual('Please name your project');
+    });
+
     it('should not post a project to the database if the given name is already used', async () => {
       const duplicateProject = await database('projects').first();
 
       const response = await request(app).post('/api/v1/projects/').send(duplicateProject);
 
       expect(response.status).toEqual(422)
-      expect(response.body).toEqual(`Project name with ${duplicateProject.name} already exists. Please provide a unique name`);
+      expect(response.body.error).toEqual(`Project name with ${duplicateProject.name} already exists. Please provide a unique name`);
     });
 
     it('should post a new palette to the database', async () => {

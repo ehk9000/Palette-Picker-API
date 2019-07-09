@@ -66,8 +66,8 @@ app.post('/api/v1/projects/', async (req, res) => {
   const { name } = req.body;
   const duplicated = await database('projects').where('name', name).first();
 
-  if (!name) return res.status(422).json('Please name your project');
-  if (duplicated) return res.status(422).json(`Project name with ${name} already exists. Please provide a unique name`);
+  if (!name) return res.status(422).json({ error: 'Please name your project' });
+  if (duplicated) return res.status(422).json({ error: `Project name with ${name} already exists. Please provide a unique name` });
   
   try {    
     const id = await database('projects').insert({ name }, 'id');
