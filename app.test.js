@@ -137,8 +137,29 @@ describe('Server', () => {
 
       const response = await request(app).post('/api/v1/palettes/').send(newPalette);
 
+      expect(response.status).toEqual(201)
       expect({...newPalette, id: response.body.id}).toEqual(response.body);
-    })
+    });
+
+    it('should not post a palette to the database if any of the required parameters are not provided', async () => {
+      const { id } = await database('projects').first();
+      const newPalette = {
+        name: '',
+        color_1: '3e3e3e',
+        color_2: '6f6f6f',
+        color_3: '7e7e7e',
+        color_4: 'eeeeee',
+        color_5: '999999',
+        project_id: id
+      };
+
+      const response = await request(app).post('/api/v1/palettes/').send(newPalette);
+
+      expect(response.status).toEqual(422)
+      expect(response.body.error).toEqual(`Expected format: palette_name: <String>, project_id: <String>, color_1:<String>,
+        color_2:<String>, color_3:<String>, color_4:<String>, color_5:<String>.
+        You are missing name property`);
+    });
 
     it('should not post a palette to the database if the given name is already used', async () => {
       const duplicatePalette = await database('palettes').first();
