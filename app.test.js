@@ -185,7 +185,15 @@ describe('Server', () => {
       expect(id).toEqual(response.body.id);
       expect(response.body).toEqual(expectedProject);
 
-    })
+    });
+
+    it('should not update a project if there are no projects with the given id', async () => {
+      const project = {name: 'Test', id: 500}
+      const response = await request(app).put(`/api/v1/projects/${project.id}`).send(project);
+
+      expect(response.body.error).toEqual(`Can't find project with id ${project.id}`);
+    });
+
     it('should update palette based on id', async () => {
       const palette = await database('palettes').first();
       let expectedPalette = palette;
