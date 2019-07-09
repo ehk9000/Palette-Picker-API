@@ -67,6 +67,13 @@ describe('Server', () => {
         expect(project).toEqual(expectedProject);
       })
 
+      it('should return an error message if the given id doesn\'t match any project', async () => {
+        const response = await request(app).get(`/api/v1/projects/${500}`);
+        const error = response.body.error;
+        
+        expect(error).toEqual('Can\'t find project with id 500');
+      })
+
       it('should return a single palette with the id in the params', async () => {
         const expectedPalette = await database('palettes').first();
         const id = expectedPalette.id;
@@ -77,6 +84,13 @@ describe('Server', () => {
         const palette = response.body;
 
         expect(palette).toEqual(expectedPalette);
+      })
+
+      it('should return an error message if the given id doesn\'t match any palette', async () => {
+        const response = await request(app).get(`/api/v1/palettes/${500}`);
+        const error = response.body.error;
+        
+        expect(error).toEqual('Can\'t find palette with id 500');
       })
     })
   })
