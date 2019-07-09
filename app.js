@@ -63,19 +63,14 @@ app.get('/api/v1/palettes/:id', async (req, res) => {
 
 
 app.post('/api/v1/projects/', async (req, res) => {
-  const { name } = req.body
-  const projectAlreadyExists = await database('projects').where({name})
+  const { name } = req.body;
+  const duplicated = await database('projects').where('name', name).first();
 
-  try {
-    if(!name) {
-      return res.status(422).json('Please name your project');
-
-    }
-    if (projectAlreadyExists.length !== 0) {
-      return res.status(422).json(`Project name with ${name} already exists. Please provide a unique name`)
-    }
-      
-    const id = await database('projects').insert({ name }, 'id')
+  if (!name) return res.status(422).json({ error: 'Please name your project' });
+  if (duplicated) return res.status(422).json({ error: `Project name with ${name} already exists. Please provide a unique name` });
+  
+  try {    
+    const id = await database('projects').insert({ name }, 'id');
     res.status(201).json({ name, id: id[0] });
   }
   catch(error) {
@@ -85,37 +80,23 @@ app.post('/api/v1/projects/', async (req, res) => {
 
 app.post('/api/v1/palettes/', async (req, res) => {
   const palette = req.body;
+  const duplicated = await database('palettes').where('name', palette.name).first();
+  const requiredFormat = ['name', 'project_id','color_1', 'color_2', 'color_3', 'color_4', 'color_5']
 
-  let requiredFormat = ['name', 'project_name','color_1', 'color_2', 'color_3', 'color_4', 'color_5']
+  if (duplicated) return res.status(422).json({ error: `Palette name of ${duplicated.name} already exists. Please provide a unique name`})
 
   for (let requiredParameter of requiredFormat) {
     if (!palette[requiredParameter]) {
       return res.status(422).send({ 
-        error: `Expected format: palette_name: <String>, color_1:<String>,
+        error: `Expected format: palette_name: <String>, project_id: <String>, color_1:<String>,
         color_2:<String>, color_3:<String>, color_4:<String>, color_5:<String>.
-        You are missing "${requiredParameter}" property`})
+        You are missing ${requiredParameter} property`})
     }
   }
 
-  // if (!palette.project_name) {
-  //   palette.project_name = 'Unsaved Project'
-  //   const id = await database('projects').insert({name: 'Unsaved Project'}, 'id')
-  //   res.status(201).json({id: id[0]})
-  // }
-
-  const newPalette = {
-    name: palette.name,
-    color_1: palette.color_1,
-    color_2: palette.color_2,
-    color_3: palette.color_3,
-    color_4: palette.color_4,
-    color_5: palette.color_5
-  }
-
   try {
-    const projectId = await database('projects').where({name: palette.project_name}).select('id')
-    const finishedPalette = await database('palettes').insert({...newPalette, project_id: projectId[0].id}, 'id');
-    res.status(201).json({ id: finishedPalette[0]})
+    const id = await database('palettes').insert(palette, 'id')[0];
+    res.status(201).json({...palette, id })
   }
   catch(error) {
     res.status(500).json({ error })
@@ -151,7 +132,7 @@ app.put('/api/v1/palettes/:id', async (req, res) => {
   const id = req.params.id
   const palette = await database('palettes').where('id', id)
   const newPalette = req.body
-  let requiredFormat = ['name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
+  let requiredFormat = ['name', 'project_id', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5']
 
   if (!palette.length) {
     return res.status(404).json({ error: `Can't find palette with id ${id}`})
@@ -162,7 +143,7 @@ app.put('/api/v1/palettes/:id', async (req, res) => {
       return res.status(422).send({
         error: `Expected format: name: <String>, color_1:<String>,
         color_2:<String>, color_3:<String>, color_4:<String>, color_5:<String>.
-        You are missing "${requiredParameter}" property`
+        You are missing ${requiredParameter} property`
       })
     }
   }
@@ -175,8 +156,6 @@ app.put('/api/v1/palettes/:id', async (req, res) => {
   catch(error) {
     res.status(500).json({ error })
   }
-
-
 })
 
 app.delete('/api/v1/projects/:id', async (req, res) => {
