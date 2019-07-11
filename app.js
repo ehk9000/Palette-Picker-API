@@ -95,8 +95,8 @@ app.post('/api/v1/palettes/', async (req, res) => {
   }
 
   try {
-    const id = await database('palettes').insert(palette, 'id')[0];
-    res.status(201).json({...palette, id })
+    const id = await database('palettes').insert(palette, 'id');
+    res.status(201).json({...palette, id: id[0] })
   }
   catch(error) {
     res.status(500).json({ error })
